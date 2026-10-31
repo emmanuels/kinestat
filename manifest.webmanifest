@@ -1,0 +1,17 @@
+{
+  "name": "KinéStat",
+  "short_name": "KinéStat",
+  "description": "Mesure d'angles articulaires sur photo pour le suivi kiné. Données conservées sur l'appareil.",
+  "lang": "fr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#eef2f4",
+  "theme_color": "#0d6b86",
+  "icons": [
+    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}

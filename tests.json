@@ -1,0 +1,252 @@
+{
+  "version": 1,
+  "description": "Catalogue des tests KinéStat. Angle ABC mesuré au sommet B (0 à 180°). Valeur clinique = a × ABC + b. Repères à valider par la kiné.",
+  "groups": [
+    {
+      "id": "hanche",
+      "name": "Hanche",
+      "tests": [
+        "hip_flex",
+        "slr",
+        "hip_ext",
+        "thomas",
+        "hip_abd"
+      ]
+    },
+    {
+      "id": "genou",
+      "name": "Genou",
+      "tests": [
+        "knee_flex",
+        "knee_ext",
+        "ake",
+        "pke",
+        "ely",
+        "thomas_rf"
+      ]
+    },
+    {
+      "id": "cheville",
+      "name": "Cheville",
+      "tests": [
+        "ankle",
+        "lunge"
+      ]
+    },
+    {
+      "id": "autre",
+      "name": "Autre",
+      "tests": [
+        "libre"
+      ]
+    }
+  ],
+  "tests": {
+    "hip_flex": {
+      "name": "Flexion de hanche (genou fléchi)",
+      "short": "Flexion hanche",
+      "position": "Sur le dos, genou fléchi. Photo de profil.",
+      "landmarks": {
+        "A": "Condyle fémoral latéral",
+        "B": "Grand trochanter",
+        "C": "Crête iliaque (ligne du tronc)"
+      },
+      "clinical": {
+        "label": "Flexion de hanche",
+        "a": -1,
+        "b": 180
+      }
+    },
+    "slr": {
+      "name": "Élévation jambe tendue (SLR)",
+      "short": "SLR",
+      "position": "Sur le dos, genou tendu, jambe levée passivement. Photo de profil.",
+      "landmarks": {
+        "A": "Malléole latérale (jambe levée)",
+        "B": "Grand trochanter",
+        "C": "Condyle latéral de la jambe à plat"
+      },
+      "clinical": {
+        "label": "Élévation jambe tendue",
+        "a": 1,
+        "b": 0
+      }
+    },
+    "hip_ext": {
+      "name": "Extension de hanche",
+      "short": "Extension hanche",
+      "position": "Sur le ventre. Photo de profil.",
+      "landmarks": {
+        "A": "Condyle fémoral latéral",
+        "B": "Grand trochanter",
+        "C": "Crête iliaque (ligne du tronc)"
+      },
+      "clinical": {
+        "label": "Extension de hanche",
+        "a": -1,
+        "b": 180
+      }
+    },
+    "thomas": {
+      "name": "Test de Thomas (flessum de hanche)",
+      "short": "Thomas",
+      "position": "Sur le dos en bout de table, genou opposé tenu contre la poitrine, jambe testée pendante. Photo de profil.",
+      "landmarks": {
+        "A": "Condyle fémoral latéral (jambe pendante)",
+        "B": "Grand trochanter",
+        "C": "Crête iliaque (ligne du tronc)"
+      },
+      "clinical": {
+        "label": "Flessum de hanche",
+        "a": -1,
+        "b": 180
+      }
+    },
+    "hip_abd": {
+      "name": "Abduction / adduction de hanche",
+      "short": "Abduction hanche",
+      "position": "Sur le dos. Photo de face, prise au-dessus du bassin.",
+      "landmarks": {
+        "A": "Centre de la rotule",
+        "B": "EIAS du côté testé",
+        "C": "EIAS opposée"
+      },
+      "clinical": {
+        "label": "Abduction (− = adduction)",
+        "a": 1,
+        "b": -90
+      }
+    },
+    "knee_flex": {
+      "name": "Flexion du genou",
+      "short": "Flexion genou",
+      "position": "Sur le dos ou sur le ventre. Photo de profil.",
+      "landmarks": {
+        "A": "Malléole latérale",
+        "B": "Interligne latéral du genou",
+        "C": "Grand trochanter"
+      },
+      "clinical": {
+        "label": "Flexion du genou",
+        "a": -1,
+        "b": 180
+      }
+    },
+    "knee_ext": {
+      "name": "Extension du genou (flessum)",
+      "short": "Flessum genou",
+      "position": "Sur le dos, jambe tendue. Photo de profil. Un récurvatum ne se distingue pas d'un flessum sur l'angle seul : précisez-le en note.",
+      "landmarks": {
+        "A": "Malléole latérale",
+        "B": "Interligne latéral du genou",
+        "C": "Grand trochanter"
+      },
+      "clinical": {
+        "label": "Flessum du genou",
+        "a": -1,
+        "b": 180
+      }
+    },
+    "ake": {
+      "name": "Extension active du genou (AKE)",
+      "short": "AKE",
+      "position": "Sur le dos, hanche à 90°. Le patient tend activement le genou au maximum. Photo de profil.",
+      "landmarks": {
+        "A": "Malléole latérale",
+        "B": "Interligne latéral du genou",
+        "C": "Grand trochanter"
+      },
+      "clinical": {
+        "label": "Déficit d'extension",
+        "a": -1,
+        "b": 180
+      }
+    },
+    "pke": {
+      "name": "Extension passive du genou (PKE, angle poplité)",
+      "short": "PKE",
+      "position": "Sur le dos, hanche à 90°. Extension passive jusqu'à la première résistance ferme. Photo de profil.",
+      "landmarks": {
+        "A": "Malléole latérale",
+        "B": "Interligne latéral du genou",
+        "C": "Grand trochanter"
+      },
+      "clinical": {
+        "label": "Déficit d'extension",
+        "a": -1,
+        "b": 180
+      }
+    },
+    "ely": {
+      "name": "Ely test (droit fémoral)",
+      "short": "Ely",
+      "position": "Sur le ventre, flexion passive du genou. Photo de profil.",
+      "landmarks": {
+        "A": "Malléole latérale",
+        "B": "Interligne latéral du genou",
+        "C": "Grand trochanter"
+      },
+      "clinical": {
+        "label": "Flexion du genou",
+        "a": -1,
+        "b": 180
+      }
+    },
+    "thomas_rf": {
+      "name": "Thomas modifié (droit fémoral)",
+      "short": "Thomas DF",
+      "position": "Position du test de Thomas, jambe testée pendante. Photo de profil.",
+      "landmarks": {
+        "A": "Malléole latérale (jambe pendante)",
+        "B": "Interligne latéral du genou",
+        "C": "Grand trochanter"
+      },
+      "clinical": {
+        "label": "Flexion du genou",
+        "a": -1,
+        "b": 180
+      }
+    },
+    "ankle": {
+      "name": "Flexion dorsale / plantaire de cheville",
+      "short": "Cheville",
+      "position": "Assis ou sur le dos. Photo de profil.",
+      "landmarks": {
+        "A": "Tête du 5e métatarsien",
+        "B": "Malléole latérale",
+        "C": "Tête de la fibula"
+      },
+      "clinical": {
+        "label": "Flexion dorsale (− = plantaire)",
+        "a": -1,
+        "b": 90
+      }
+    },
+    "lunge": {
+      "name": "Fente genou-mur (lunge test)",
+      "short": "Fente",
+      "position": "Debout en fente, genou vers le mur, talon au sol. Photo de profil.",
+      "landmarks": {
+        "A": "Tête de la fibula",
+        "B": "Malléole latérale",
+        "C": "Point au sol vers l'avant (5e métatarsien)"
+      },
+      "clinical": {
+        "label": "Inclinaison du tibia",
+        "a": -1,
+        "b": 90
+      }
+    },
+    "libre": {
+      "name": "Mesure libre (3 points)",
+      "short": "Libre",
+      "position": "Angle quelconque entre trois repères, sommet en B.",
+      "landmarks": {
+        "A": "Point A",
+        "B": "Sommet B",
+        "C": "Point C"
+      },
+      "clinical": null
+    }
+  }
+}

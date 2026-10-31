@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>KinéStat</title>
+<meta name="description" content="Mesure d'angles articulaires sur photo pour le suivi kiné. Données conservées sur l'appareil.">
+<meta name="theme-color" content="#0d6b86">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="KinéStat">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <h1 id="title">Patients</h1>
+    <span class="chip">v1</span>
+  </div>
+</header>
+
+<div class="wrap banners">
+  <div id="install-banner" class="note hidden">
+    <span>Installez KinéStat : bouton <b>Partager</b> de Safari, puis <b>Sur l'écran d'accueil</b>. Sinon iOS peut effacer vos données au bout de quelques semaines.</span>
+    <button type="button" class="btn small" id="install-close">OK</button>
+  </div>
+</div>
+
+<!-- ============ PATIENTS ============ -->
+<main id="view-patients" class="wrap view">
+  <section id="onboarding" class="card hidden" aria-label="Bienvenue"></section>
+  <div id="backup-reminder" class="note warn hidden"></div>
+  <div class="row">
+    <input type="search" id="p-search" placeholder="Rechercher des initiales" aria-label="Rechercher un patient" autocomplete="off">
+    <button class="btn primary" id="btn-add-patient" type="button">+ Patient</button>
+  </div>
+  <form id="patient-form" class="card form hidden" aria-label="Nouveau patient">
+    <div class="field">
+      <label for="pf-initials">Initiales</label>
+      <input type="text" id="pf-initials" maxlength="6" autocapitalize="characters" autocomplete="off" placeholder="ex. MD">
+    </div>
+    <div class="field">
+      <label for="pf-extra">Complément (facultatif)</label>
+      <input type="text" id="pf-extra" maxlength="30" autocomplete="off" placeholder="Année de naissance, n° de dossier…">
+    </div>
+    <label class="check"><input type="checkbox" id="pf-consent"> Consentement photo recueilli</label>
+    <div class="row">
+      <button class="btn primary" type="submit">Ajouter le patient</button>
+      <button class="btn" type="button" id="pf-cancel">Annuler</button>
+    </div>
+    <p class="status" id="pf-status"></p>
+  </form>
+  <div id="patient-list" class="list"></div>
+</main>
+
+<!-- ============ MESURE ============ -->
+<main id="view-mesure" class="wrap view hidden">
+  <section class="card controls" aria-label="Contexte de la mesure">
+    <div class="field">
+      <label for="patient">Patient</label>
+      <select id="patient"></select>
+      <label class="check" id="consent-wrap"><input type="checkbox" id="consent"> Consentement photo recueilli</label>
+    </div>
+    <div class="field">
+      <label for="test">Test</label>
+      <select id="test"></select>
+    </div>
+    <div class="field">
+      <span class="lbl" id="side-lbl">Côté mesuré</span>
+      <div class="seg" role="radiogroup" aria-labelledby="side-lbl">
+        <input type="radio" name="side" id="side-g" value="G" checked><label for="side-g">Gauche</label>
+        <input type="radio" name="side" id="side-d" value="D"><label for="side-d">Droite</label>
+      </div>
+    </div>
+    <div class="field">
+      <label for="date">Date de la séance</label>
+      <input type="date" id="date">
+    </div>
+  </section>
+
+  <section class="photo-actions" aria-label="Photo">
+    <label class="btn primary" for="file-cam">Prendre une photo</label>
+    <input class="sr" type="file" id="file-cam" accept="image/*" capture="environment">
+    <label class="btn" for="file-lib">Photothèque</label>
+    <input class="sr" type="file" id="file-lib" accept="image/*">
+    <button class="btn" type="button" id="btn-reset">Replacer les points</button>
+  </section>
+
+  <div class="toolbar">
+    <div class="guide" id="guide" aria-live="polite"></div>
+    <div class="zoom" role="group" aria-label="Zoom">
+      <button type="button" id="z-out" aria-label="Dézoomer">−</button>
+      <button type="button" id="z-in" aria-label="Zoomer">+</button>
+      <button type="button" id="z-fit">Ajuster</button>
+    </div>
+  </div>
+
+  <section class="stage" id="stage" aria-label="Photo et points de mesure">
+    <div class="empty-stage" id="empty-stage">
+      <p><b>Aucune photo</b></p>
+      <p>Prenez une photo du patient ou choisissez-en une dans la photothèque.</p>
+    </div>
+    <div class="cwrap hidden" id="cwrap">
+      <canvas id="cv" tabindex="0" aria-label="Photo du patient. Touchez pour placer les points A, B puis C, faites glisser un point pour l'ajuster, pincez pour zoomer. Au clavier : touches A, B, C pour choisir un point, flèches pour le déplacer."></canvas>
+      <canvas id="loupe" width="128" height="128" aria-hidden="true"></canvas>
+    </div>
+    <span class="stage-tag hidden" id="stage-tag"></span>
+  </section>
+
+  <section class="legend" id="legend" aria-label="Repères anatomiques"></section>
+  <p class="tip" id="test-pos"></p>
+
+  <section class="card result" aria-live="polite">
+    <div class="vals">
+      <div>
+        <div class="lbl">Angle ABC</div>
+        <div class="big" id="angle">–</div>
+      </div>
+      <div id="clin-wrap">
+        <div class="lbl" id="clin-label">Valeur clinique</div>
+        <div class="big clin" id="clin">–</div>
+      </div>
+    </div>
+    <form class="save" id="save-form">
+      <input type="text" id="note" placeholder="Note (douleur, sensation, conditions…)" autocomplete="off">
+      <div class="btns">
+        <button class="btn primary" type="submit" id="btn-save">Enregistrer la mesure</button>
+        <button class="btn hidden" type="button" id="btn-new">Nouvelle mesure</button>
+      </div>
+    </form>
+    <p class="status" id="status"></p>
+  </section>
+  <p class="tip">Téléphone de profil, à hauteur de la table et perpendiculaire au plan du mouvement, à la même distance à chaque séance. Des pastilles sur les repères osseux améliorent la reproductibilité. Précision d'une mesure photo : environ ±3 à 5°.</p>
+</main>
+
+<!-- ============ SUIVI ============ -->
+<main id="view-suivi" class="wrap view hidden">
+  <section class="card controls" aria-label="Filtre du suivi">
+    <div class="field">
+      <label for="s-patient">Patient</label>
+      <select id="s-patient"></select>
+    </div>
+    <div class="field">
+      <label for="s-test">Test</label>
+      <select id="s-test"></select>
+    </div>
+  </section>
+  <section class="tiles" id="tiles" aria-label="Résumé"></section>
+  <section class="card">
+    <div class="head">
+      <h2>Évolution de l'angle ABC</h2>
+      <div class="keys"><span class="kg">Gauche</span><span class="kd">Droite</span></div>
+    </div>
+    <div id="chart"></div>
+  </section>
+  <section class="card">
+    <div class="head"><h2>Comparaison</h2><span class="tip">Choisissez 2 mesures avec « Comparer »</span></div>
+    <div id="compare" class="compare"></div>
+  </section>
+  <section>
+    <div class="head">
+      <h2>Mesures</h2>
+      <button class="btn small" type="button" id="btn-csv-patient">Exporter ce patient (CSV)</button>
+    </div>
+    <p class="status" id="s-status"></p>
+    <div class="list" id="list"></div>
+  </section>
+</main>
+
+<!-- ============ RÉGLAGES ============ -->
+<main id="view-reglages" class="wrap view hidden">
+  <section class="card stack">
+    <h2>Sauvegarde chiffrée</h2>
+    <p class="tip">Les données ne sont que sur ce téléphone. Une sauvegarde régulière vous protège en cas de perte ou de changement d'iPhone. Le fichier est chiffré (AES-256) avec votre phrase secrète : sans elle, personne ne peut le lire, et elle ne peut pas être récupérée.</p>
+    <p id="last-backup" class="tip"></p>
+    <div class="field"><label for="bk-pass">Phrase secrète (8 caractères minimum)</label><input type="password" id="bk-pass" autocomplete="new-password"></div>
+    <div class="field"><label for="bk-pass2">Confirmez la phrase secrète</label><input type="password" id="bk-pass2" autocomplete="new-password"></div>
+    <div class="row">
+      <button class="btn primary" type="button" id="bk-prepare">Préparer la sauvegarde</button>
+      <button class="btn hidden" type="button" id="bk-save">Enregistrer le fichier</button>
+    </div>
+    <p class="status" id="bk-status"></p>
+  </section>
+
+  <section class="card stack">
+    <h2>Restaurer une sauvegarde</h2>
+    <p class="tip">La restauration remplace toutes les données actuelles de l'application.</p>
+    <div class="field"><label for="rs-file">Fichier de sauvegarde</label><input type="file" id="rs-file"></div>
+    <div class="field"><label for="rs-pass">Phrase secrète</label><input type="password" id="rs-pass" autocomplete="current-password"></div>
+    <div class="row">
+      <button class="btn" type="button" id="rs-open">Déchiffrer</button>
+      <button class="btn danger hidden" type="button" id="rs-apply">Remplacer mes données</button>
+    </div>
+    <p class="status" id="rs-status"></p>
+  </section>
+
+  <section class="card stack">
+    <h2>Export</h2>
+    <p class="tip">Toutes les mesures de tous les patients, au format CSV (Excel, Numbers).</p>
+    <div class="row"><button class="btn" type="button" id="btn-csv-all">Exporter toutes les mesures (CSV)</button></div>
+    <p class="status" id="csv-status"></p>
+  </section>
+
+  <section class="card stack">
+    <h2>Stockage</h2>
+    <p class="tip" id="storage-info"></p>
+  </section>
+
+  <section class="card stack">
+    <h2>Patient exemple</h2>
+    <p class="tip">Un patient fictif « EX » avec des mesures d'AKE, pour découvrir le suivi et la comparaison.</p>
+    <div class="row"><button class="btn" type="button" id="btn-example"></button></div>
+  </section>
+
+  <section class="card stack">
+    <h2>Protocole photo</h2>
+    <ul class="tips">
+      <li>Téléphone de profil, perpendiculaire au plan du mouvement.</li>
+      <li>Même distance et même hauteur à chaque séance (repère au sol, trépied si possible).</li>
+      <li>Pastilles sur les repères osseux avant la photo.</li>
+      <li>Toute la jambe dans le cadre, sans grand-angle (zoom ×1).</li>
+    </ul>
+  </section>
+  <p class="tip center">KinéStat <span id="version"></span> · données conservées sur cet appareil uniquement</p>
+</main>
+
+<nav class="tabs" aria-label="Navigation">
+  <a href="#patients" id="tab-patients"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M16 4.8a3.3 3.3 0 0 1 0 6.4M18 14.8c2 .7 3.2 2.4 3.5 5.2"/></svg><span>Patients</span></a>
+  <a href="#mesure" id="tab-mesure"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20 12 5l8 15"/><path d="M8.2 12.2a5 5 0 0 1 7.6 0"/></svg><span>Mesure</span></a>
+  <a href="#suivi" id="tab-suivi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18"/><path d="m4 16 5-5 4 3 7-8"/></svg><span>Suivi</span></a>
+  <a href="#reglages" id="tab-reglages"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg><span>Réglages</span></a>
+</nav>
+
+<script src="app.js"></script>
+</body>
+</html>
